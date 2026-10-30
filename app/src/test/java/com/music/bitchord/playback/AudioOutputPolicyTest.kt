@@ -125,6 +125,24 @@ class AudioOutputPolicyTest {
     }
 
     @Test
+    fun experimentalBluetoothPathDoesNotRelaxWiredFloatChecks() {
+        assertFalse(
+            AudioOutputPolicy.shouldUseFloatOutput(
+                OutputPcmMode.FLOAT_32,
+                routeKind = AudioRouting.Kind.WIRED,
+                advertisesPcmFloat = false,
+            ),
+        )
+        assertTrue(
+            AudioOutputPolicy.shouldUseFloatOutput(
+                OutputPcmMode.FLOAT_32,
+                routeKind = AudioRouting.Kind.WIRED,
+                advertisesPcmFloat = true,
+            ),
+        )
+    }
+
+    @Test
     fun samsungVendorFlacDecoderIsBlockedForFloatOutput() {
         assertTrue(AudioOutputPolicy.isUnsafeFloatFlacDecoder("c2.sec.flac.decoder"))
         assertTrue(AudioOutputPolicy.isUnsafeFloatFlacDecoder("OMX.SEC.FLAC.Decoder"))
