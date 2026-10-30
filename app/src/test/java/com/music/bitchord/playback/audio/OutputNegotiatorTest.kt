@@ -85,7 +85,22 @@ class OutputNegotiatorTest {
         assertEquals(PcmEncoding.PCM_FLOAT, btWithFloat.output.encoding)
         assertEquals(FallbackReason.NONE, btWithFloat.output.fallbackReason)
 
-        val btPcm16Only = OutputNegotiator.negotiate(
+        val btPcm16Advertised = OutputNegotiator.negotiate(
+            source = flac96kHz24BitSource,
+            decoderName = "c2.android.flac.decoder",
+            sampleRateHz = 96000,
+            channelCount = 2,
+            routeKind = AudioRouting.Kind.BLUETOOTH,
+            deviceName = "Galaxy Buds3 Pro (SSC)",
+            advertisedEncodings = listOf(AudioFormat.ENCODING_PCM_16BIT),
+            advertisedSampleRates = listOf(44100, 48000, 96000),
+            requestedMode = OutputPcmMode.FLOAT_32,
+            delegateSupportsFloat = true,
+        )
+        assertEquals(PcmEncoding.PCM_FLOAT, btPcm16Advertised.output.encoding)
+
+        // If Media3 cannot open Float32, the route must still fall back.
+        val btNoFloatSupport = OutputNegotiator.negotiate(
             source = flac96kHz24BitSource,
             decoderName = "c2.android.flac.decoder",
             sampleRateHz = 96000,
@@ -95,9 +110,10 @@ class OutputNegotiatorTest {
             advertisedEncodings = listOf(AudioFormat.ENCODING_PCM_16BIT),
             advertisedSampleRates = listOf(44100, 48000),
             requestedMode = OutputPcmMode.FLOAT_32,
+            delegateSupportsFloat = false,
         )
-        assertEquals(PcmEncoding.PCM_16BIT, btPcm16Only.output.encoding)
-        assertEquals(FallbackReason.ROUTE_LIMITATION, btPcm16Only.output.fallbackReason)
+        assertEquals(PcmEncoding.PCM_16BIT, btNoFloatSupport.output.encoding)
+        assertEquals(FallbackReason.ROUTE_LIMITATION, btNoFloatSupport.output.fallbackReason)
     }
 
     @Test
