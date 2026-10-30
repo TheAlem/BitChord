@@ -8,8 +8,10 @@ import com.music.bitchord.data.settings.OutputPcmMode
  * Float output is not a quality switch that is safe on every Android route.
  * Some OEM speaker paths accept the AudioTrack and then convert it to PCM16 in
  * AudioFlinger; on affected Samsung FLAC decoders that combination can also
- * produce timestamp discontinuities and severely distorted output. Only an
- * explicitly selected external route that advertises PCM float is allowed.
+ * produce timestamp discontinuities and severely distorted output.
+ * The phone speaker stays capped at PCM16. On Bluetooth, an explicit Float32
+ * request can try native Float32 despite an incomplete A2DP encoding list,
+ * with the sink retaining PCM16 fallback when Float32 is unsupported.
  */
 internal object AudioOutputPolicy {
     /** Backwards-compatible USB-specific check. */
