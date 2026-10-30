@@ -70,7 +70,7 @@ class OutputNegotiatorTest {
     }
 
     @Test
-    fun bluetoothNegotiatesFloatOnlyWhenAdvertised() {
+    fun bluetoothNegotiatesRequestedFloatAcrossA2dpDevicesWithPcm16Fallback() {
         val btWithFloat = OutputNegotiator.negotiate(
             source = flac96kHz24BitSource,
             decoderName = "c2.android.flac.decoder",
@@ -127,21 +127,6 @@ class OutputNegotiatorTest {
             assertEquals(deviceName, FallbackReason.ROUTE_LIMITATION, unsupported.output.fallbackReason)
         }
 
-        // A failing/unsupported Float32 sink still negotiates the safe PCM16 path.
-        val btNoFloatSink = OutputNegotiator.negotiate(
-            source = flac96kHz24BitSource,
-            decoderName = "c2.android.flac.decoder",
-            sampleRateHz = 96000,
-            channelCount = 2,
-            routeKind = AudioRouting.Kind.BLUETOOTH,
-            deviceName = "SBC Headset",
-            advertisedEncodings = listOf(AudioFormat.ENCODING_PCM_16BIT),
-            advertisedSampleRates = listOf(44100, 48000),
-            requestedMode = OutputPcmMode.FLOAT_32,
-            delegateSupportsFloat = false,
-        )
-        assertEquals(PcmEncoding.PCM_16BIT, btNoFloatSink.output.encoding)
-        assertEquals(FallbackReason.ROUTE_LIMITATION, btNoFloatSink.output.fallbackReason)
     }
 
     @Test
