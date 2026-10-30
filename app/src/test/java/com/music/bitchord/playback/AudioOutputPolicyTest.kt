@@ -80,7 +80,7 @@ class AudioOutputPolicyTest {
     }
 
     @Test
-    fun routeAwareBluetoothAllowsFloatOnlyWhenAdvertised() {
+    fun routeAwareBluetoothTriesFloatWhenRequestedEvenIfPcm16IsAdvertised() {
         assertTrue(
             AudioOutputPolicy.shouldUseFloatOutput(
                 OutputPcmMode.FLOAT_32,
@@ -88,9 +88,18 @@ class AudioOutputPolicyTest {
                 advertisesPcmFloat = true,
             ),
         )
-        assertFalse(
+        // A2DP may advertise only PCM16 even when Android's mixer accepts
+        // Float32. The AudioSink still checks actual support before using it.
+        assertTrue(
             AudioOutputPolicy.shouldUseFloatOutput(
                 OutputPcmMode.FLOAT_32,
+                routeKind = AudioRouting.Kind.BLUETOOTH,
+                advertisesPcmFloat = false,
+            ),
+        )
+        assertFalse(
+            AudioOutputPolicy.shouldUseFloatOutput(
+                OutputPcmMode.PCM_16,
                 routeKind = AudioRouting.Kind.BLUETOOTH,
                 advertisesPcmFloat = false,
             ),
